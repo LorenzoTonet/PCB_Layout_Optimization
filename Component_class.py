@@ -3,6 +3,7 @@ from typing import Tuple, List
 from shapely.geometry import Point, Polygon
 from shapely.affinity import rotate, translate
 import math
+import numpy as np
 
 vec2D = Tuple[float, float]
 
@@ -15,19 +16,39 @@ class Pin:
     absolute_x: float = None
     absolute_y: float = None
 
+    def clone(self):
+        return Pin(
+            id=self.id,
+            relative_x=self.relative_x,
+            relative_y=self.relative_y,
+            absolute_x=self.absolute_x,
+            absolute_y=self.absolute_y
+        )
 
 class Component:
-    def __init__(self, id:str, shape:str, size_x:float, size_y:float, pins:list[Pin], position: vec2D, rotation: float = 0.0, temp_gradient = None):
+    def __init__(self, id:str, shape:str, size_x:float, size_y:float, pins:list[Pin], position: vec2D, rotation: float = 0.0, temp_gradient_params = None):
         self.id = id
         self.shape = shape
         self.size_x = size_x
         self.size_y = size_y
-        self.pins = pins
+        self.pins = [p.clone() for p in pins]
         self.position = position
         self.rotation = rotation
-        self.temp_gradient = temp_gradient
+        self.temp_gradient_params = temp_gradient_params
 
         self.update_absolute_pin_position()
+
+    def clone(self):
+        return Component(
+            id=self.id,
+            shape=self.shape,
+            size_x=self.size_x,
+            size_y=self.size_y,
+            pins=[p.clone() for p in self.pins],
+            position=self.position,
+            rotation=self.rotation,
+            temp_gradient_params=self.temp_gradient_params
+        )
     
     def get_shape(self):
         """Return the Shapely geometry representing the component."""
@@ -69,7 +90,7 @@ class Component:
         return self.position
 
     def update_absolute_pin_position(self):
-            px, py = self.position
+            px, py = self.position 
             rad = math.radians(self.rotation)
 
             for pin in self.pins:
@@ -80,6 +101,18 @@ class Component:
                 # translate
                 pin.absolute_x = px + rx
                 pin.absolute_y = py + ry
+    
+    def thermal_field(self, x: float, y: float) -> float:
+        """Temperature contribution at point (x,y)."""
 
+        if self.temp_gradient_params is None:
+            return 0.0
+        
+        # center
+        cx, cy = self.position
+        center_temp, dissipation_length = self.temp_gradient_params
+        r = np.sqrt((x - cx)**2 + (y - cy)**2)
 
+        # exponential decay
+        return center_temp * np.exp(-r / dissipation_length)
             

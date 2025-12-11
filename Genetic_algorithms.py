@@ -1,12 +1,10 @@
-import matplotlib.pyplot as plt
 import random
 
 from PCB_class import PCB
-from Component_class import Component, Pin
-from Plots import plot_pcb
-from copy import deepcopy
+
 
 def generate_random_population(pcb_template: PCB, population_size: int):
+    """Generate a random PCB population based on a template PCB"""
     population = []
     for _ in range(population_size):
 
@@ -24,6 +22,7 @@ def generate_random_population(pcb_template: PCB, population_size: int):
     return population
 
 def crossover(parent1: PCB, parent2: PCB, n: int):
+    """Perform crossover between two parent PCBs by swapping n components"""
     child1 = parent1.clone()
     child2 = parent2.clone()
 
@@ -51,6 +50,7 @@ def crossover(parent1: PCB, parent2: PCB, n: int):
 
 
 def mutate_rotation(pcb: PCB, mutation_rate: float = 0.1):
+    """Mutate the rotation of a random component in the PCB with a given mutation rate"""
     if random.random() < mutation_rate:
         comp = random.choice(list(pcb.components.values()))
         angle = random.choice([90,180,270])
@@ -58,6 +58,7 @@ def mutate_rotation(pcb: PCB, mutation_rate: float = 0.1):
         pcb.resolve_conflicts()
 
 def mutate_position(pcb: PCB, mutation_rate: float = 0.1):
+    """Mutate the position of a random component in the PCB with a given mutation rate (can be very impactful)"""
     if random.random() < mutation_rate:
         comp = random.choice(list(pcb.components.values()))
         x = random.uniform(comp.size_x / 2, pcb.width - comp.size_x / 2)
@@ -65,3 +66,17 @@ def mutate_position(pcb: PCB, mutation_rate: float = 0.1):
         comp.move((x, y))
         pcb.resolve_conflicts()
 
+def tournament_select(population, ranks, crowding):
+    """Select an individual from the population using tournament selection based on ranks and if needed crowding distance"""
+
+    i, j = random.sample(range(len(population)), 2)
+
+    if ranks[i] < ranks[j]:
+        return population[i]
+    if ranks[j] < ranks[i]:
+        return population[j]
+
+    if crowding[i] > crowding[j]:
+        return population[i]
+    else:
+        return population[j]

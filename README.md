@@ -2,14 +2,9 @@
 
 In this project, the main task is to optimize the position of components of different shape, dimension and with different pins layout in a rectangular pcb board of given dimension. The objective functions taken into account are
 - Maximum temperature reached in the board
-- Total distance between pins that needs to be collected
+- Total distance between pins that needs to be connected
 - Total area occupied by components
 
----
-
-
-![Example of PCB](images/example_of_pcb.png)
-![Population results](images/Evolved_pop_vs_random_pop.png)
 ---
 
 ## File structure
@@ -21,5 +16,11 @@ In this project, the main task is to optimize the position of components of diff
  - PCB_class.py: Definition of the PCB class (individual)
  - Plots.py
  - utils.py
+
+![Example of PCB](images/example_of_pcb.png)
+![Population results](images/Evolved_pop_vs_random_pop.png)
+
+---
+
 
 

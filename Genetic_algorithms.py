@@ -60,9 +60,14 @@ def mutate_rotation(pcb: PCB, mutation_rate: float = 0.1):
 def mutate_position(pcb: PCB, mutation_rate: float = 0.1):
     """Mutate the position of a random component in the PCB with a given mutation rate (can be very impactful)"""
     if random.random() < mutation_rate:
+
         comp = random.choice(list(pcb.components.values()))
-        x = random.uniform(comp.size_x / 2, pcb.width - comp.size_x / 2)
-        y = random.uniform(comp.size_y / 2, pcb.height - comp.size_y / 2)
+
+        # to avoid problems with out-of-bound placements
+        comp_max_dim = max(comp.size_x, comp.size_y)
+
+        x = random.uniform(comp_max_dim, pcb.width - comp_max_dim)
+        y = random.uniform(comp_max_dim, pcb.height - comp_max_dim)
         comp.move((x, y))
         pcb.resolve_conflicts()
 

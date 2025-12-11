@@ -64,9 +64,7 @@ def plot_pcb(
     component_facecolor='none'
 ):
     """
-    Plot del PCB con componenti, pin, link e opzionalmente la mappa termica.
-    
-    FIXED: Now correctly handles pcb.components as a dictionary.
+    Plot of the pcb layout with optional temperature map, pins and links.
     """
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, pcb.width)

@@ -82,16 +82,32 @@ class PCB:
             overlaps = self.detect_overlaps()
             if not overlaps:
                 return 0
+            
             for compA, compB, area in overlaps:
 
                 ax, ay = self.components[compA].position
                 bx, by = self.components[compB].position
+
                 angle = math.atan2(by - ay, bx - ax)
-                # heuristic based on the overlap area (+1 to avoid near-zero distance)
-                distance = math.sqrt(area) +1
+                distance = math.sqrt(area) + 1  # avoid zero movement
+
                 new_bx = bx + math.cos(angle) * distance
                 new_by = by + math.sin(angle) * distance
-                self.components[compB].move((new_bx, new_by))
+
+                if (0 <= new_bx <= self.width) and (0 <= new_by <= self.height):
+                    self.components[compB].move((new_bx, new_by))
+                else:
+                    # If moving B out of bounds, move A in the opposite direction
+                    opposite_angle = angle + math.pi
+                    new_ax = ax + math.cos(opposite_angle) * distance
+                    new_ay = ay + math.sin(opposite_angle) * distance
+
+                    
+                    new_ax = min(max(new_ax, 0), self.width)
+                    new_ay = min(max(new_ay, 0), self.height)
+
+
+                    self.components[compA].move((new_ax, new_ay))
 
     def detect_overlaps(self):
         """Detect overlapping components using Shapely and return a list of tuples (compA_id, compB_id, overlap_area)."""

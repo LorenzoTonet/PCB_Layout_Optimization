@@ -39,6 +39,7 @@ class Component:
         self.update_absolute_pin_position()
 
     def clone(self):
+        """Return an object-clone of the component."""
         return Component(
             id=self.id,
             shape=self.shape,
@@ -75,18 +76,21 @@ class Component:
         return geom
 
     def intersects(self, other: "Component") -> bool:
-        """Detects overlap using Shapely geometry."""
+        """Detects overlap using Shapely"""
         return self.get_shape().intersects(other.get_shape())
 
     def rotate(self, angle: float):
+        """Rotate the component by a given angle (degrees)"""
         self.rotation = (self.rotation + angle) % 360
         self.update_absolute_pin_position()
 
     def move(self, new_position: vec2D):
+        """Move the component to a new position."""
         self.position = new_position
         self.update_absolute_pin_position()
 
     def get_position(self) -> vec2D:
+        """Return the current position of the component."""
         return self.position
 
     def update_absolute_pin_position(self):
@@ -94,16 +98,15 @@ class Component:
             rad = math.radians(self.rotation)
 
             for pin in self.pins:
-                # rotate relative position
+
                 rx = pin.relative_x * math.cos(rad) - pin.relative_y * math.sin(rad)
                 ry = pin.relative_x * math.sin(rad) + pin.relative_y * math.cos(rad)
 
-                # translate
                 pin.absolute_x = px + rx
                 pin.absolute_y = py + ry
     
     def thermal_field(self, x: float, y: float) -> float:
-        """Temperature contribution at point (x,y)."""
+        """Temperature contribution at point (x,y)"""
 
         if self.temp_gradient_params is None:
             return 0.0
@@ -113,6 +116,6 @@ class Component:
         center_temp, dissipation_length = self.temp_gradient_params
         r = np.sqrt((x - cx)**2 + (y - cy)**2)
 
-        # exponential decay
+        # temperature spread function
         return center_temp * np.exp(-r / dissipation_length)
             

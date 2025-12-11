@@ -2,7 +2,7 @@ from PCB_class import PCB
 
 import numpy as np
 
-def evaluate_objectives(pcb):
+def evaluate_objectives(pcb: PCB):
     """ Calculate the three fitness functions"""
     max_temp, _ = pcb.calculate_max_temp()
     occupied_area = pcb.calculate_occupied_area()
@@ -11,7 +11,7 @@ def evaluate_objectives(pcb):
     return np.array([max_temp,occupied_area, pin_distance])
 
 
-def dominates(objectives_a, objectives_b):
+def dominates(objectives_a: np.ndarray, objectives_b: np.ndarray):
     """ Check if a solution dominates another"""
 
     # used < instead of > because its a problem of minimization so its equal to maximize -fitness(x)
@@ -20,7 +20,7 @@ def dominates(objectives_a, objectives_b):
     
     return better_or_equal and strictly_better
 
-def fast_non_dominated_sort(population_objectives, verbose = True):
+def fast_non_dominated_sort(population_objectives: np.ndarray, verbose: bool = True):
     """
     Algorithm to build fronts and dominaed-sorting
     Algorithm:
@@ -87,7 +87,7 @@ def fast_non_dominated_sort(population_objectives, verbose = True):
     return fronts, ranks
 
 
-def calculate_crowding_distance(front_indices, population_objectives):
+def calculate_crowding_distance(front_indices: list, population_objectives: np.ndarray):
     """
     Calculate the crowding distance in a front
     
@@ -122,7 +122,7 @@ def calculate_crowding_distance(front_indices, population_objectives):
     return crowding_distances
 
 
-def nsga2_select(population, population_objectives, n_select):
+def nsga2_select(population: list, population_objectives: np.ndarray, n_select: int):
     """
     Selection based on dominated sorting of the individuals. Inside the same front, solutions are ranked by crowding distance.
     """
@@ -153,7 +153,7 @@ def nsga2_select(population, population_objectives, n_select):
     return selected_population, selected_objectives
 
 
-def get_pareto_front(population, population_objectives):
+def get_pareto_front(population: list, population_objectives: np.ndarray):
     """
     Return the pareto front of the population
     """
@@ -166,9 +166,9 @@ def get_pareto_front(population, population_objectives):
     return pareto_population, pareto_objectives
 
 
-def calculate_crowding_distance_for_population(pop, pop_obj, fronts):
+def calculate_crowding_distance_for_population(pop: list, pop_obj: np.ndarray, fronts: list):
     """
-    RCompute the crowding dist for the entire population
+    Compute the crowding dist for the entire population
     """
     n = len(pop)
     distances = [0.0] * n

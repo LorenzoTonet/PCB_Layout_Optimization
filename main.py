@@ -69,75 +69,75 @@ if __name__ == "__main__":
     elitism_count = 10
 
     #generation of a random population
-pop = generate_random_population(pcb1, population_size)
+    pop = generate_random_population(pcb1, population_size)
 
-for generation in range(number_of_generations):
+    for generation in range(number_of_generations):
 
-    pop_objectives = [evaluate_objectives(pcb) for pcb in pop]
+        pop_objectives = [evaluate_objectives(pcb) for pcb in pop]
 
-    fronts, ranks = fast_non_dominated_sort(pop_objectives, verbose=False)
-    crowding = calculate_crowding_distance_for_population(pop, pop_objectives, fronts)
+        fronts, ranks = fast_non_dominated_sort(pop_objectives, verbose=False)
+        crowding = calculate_crowding_distance_for_population(pop, pop_objectives, fronts)
 
-    offspring = []
-    while len(offspring) < population_size:
+        offspring = []
+        while len(offspring) < population_size:
 
-        # selection of parents (via rank and then crowding distance)
-        p1 = tournament_select(pop, ranks, crowding)
-        p2 = tournament_select(pop, ranks, crowding)
+            # selection of parents (via rank and then crowding distance)
+            p1 = tournament_select(pop, ranks, crowding)
+            p2 = tournament_select(pop, ranks, crowding)
 
-        # crossover (swap 1 component between parents)
-        child1, child2 = crossover(p1, p2, 1)
+            # crossover (swap 1 component between parents)
+            child1, child2 = crossover(p1, p2, 1)
 
-        # mutate rotation (less impactful) and position (very impactful)
-        mutate_rotation(child1, rotation_mutation_rate)
-        mutate_position(child1, position_mutation_rate)
-        mutate_rotation(child2, rotation_mutation_rate)
-        mutate_position(child2, position_mutation_rate)
+            # mutate rotation (less impactful) and position (very impactful)
+            mutate_rotation(child1, rotation_mutation_rate)
+            mutate_position(child1, position_mutation_rate)
+            mutate_rotation(child2, rotation_mutation_rate)
+            mutate_position(child2, position_mutation_rate)
 
-        offspring.append(child1)
-        offspring.append(child2)
+            offspring.append(child1)
+            offspring.append(child2)
 
-    offspring = offspring[:population_size]
-
-
-    offspring_objectives = [evaluate_objectives(pcb) for pcb in offspring]
-
-    # elitism
-    mixed_pop = pop + offspring
-    mixed_obj = pop_objectives + offspring_objectives
-
-    # select the next generation
-    pop, _ = nsga2_select(mixed_pop, mixed_obj, population_size)
-
-    plot_pcb(rnd.sample(pop, 1)[0], show_temp=True)
+        offspring = offspring[:population_size]
 
 
-    pop_results_objectives = [evaluate_objectives(pcb) for pcb in pop]
-    random_pop = generate_random_population(pcb1, population_size)
-    random_pop_results_objectives = [evaluate_objectives(pcb) for pcb in random_pop]
+        offspring_objectives = [evaluate_objectives(pcb) for pcb in offspring]
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+        # elitism
+        mixed_pop = pop + offspring
+        mixed_obj = pop_objectives + offspring_objectives
 
-    ax.scatter(
-        [obj[0] for obj in random_pop_results_objectives],   # max_temp
-        [obj[1] for obj in random_pop_results_objectives],   # occupied_area
-        [obj[2] for obj in random_pop_results_objectives],   # pin_distance
-        color='red',
-        label='Random Population'
-    )
+        # select the next generation
+        pop, _ = nsga2_select(mixed_pop, mixed_obj, population_size)
 
-    ax.scatter(
-        [obj[0] for obj in pop_results_objectives],
-        [obj[1] for obj in pop_results_objectives],
-        [obj[2] for obj in pop_results_objectives],
-        color='blue',
-        label='Evolved Population'
-    )
+        plot_pcb(rnd.sample(pop, 1)[0], show_temp=True)
 
-    ax.set_xlabel('Max temperature')
-    ax.set_ylabel('Total area')
-    ax.set_zlabel('Pin distance')
 
-    ax.legend()
-    plt.show()
+        pop_results_objectives = [evaluate_objectives(pcb) for pcb in pop]
+        random_pop = generate_random_population(pcb1, population_size)
+        random_pop_results_objectives = [evaluate_objectives(pcb) for pcb in random_pop]
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        ax.scatter(
+            [obj[0] for obj in random_pop_results_objectives],   # max_temp
+            [obj[1] for obj in random_pop_results_objectives],   # occupied_area
+            [obj[2] for obj in random_pop_results_objectives],   # pin_distance
+            color='red',
+            label='Random Population'
+        )
+
+        ax.scatter(
+            [obj[0] for obj in pop_results_objectives],
+            [obj[1] for obj in pop_results_objectives],
+            [obj[2] for obj in pop_results_objectives],
+            color='blue',
+            label='Evolved Population'
+        )
+
+        ax.set_xlabel('Max temperature')
+        ax.set_ylabel('Total area')
+        ax.set_zlabel('Pin distance')
+
+        ax.legend()
+        plt.show()

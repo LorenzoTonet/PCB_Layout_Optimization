@@ -21,7 +21,7 @@ def generate_random_population(pcb_template: PCB, population_size: int):
 
     return population
 
-def crossover(parent1: PCB, parent2: PCB, n: int):
+def crossover(parent1: PCB, parent2: PCB, n: int, crossover_rate: float = 0.9):
     """Perform crossover between two parent PCBs by swapping n components"""
     child1 = parent1.clone()
     child2 = parent2.clone()
@@ -53,7 +53,7 @@ def mutate_rotation(pcb: PCB, mutation_rate: float = 0.1):
     """Mutate the rotation of a random component in the PCB with a given mutation rate"""
     if random.random() < mutation_rate:
         comp = random.choice(list(pcb.components.values()))
-        angle = random.choice([90,180,270])
+        angle = random.randint(0,359)
         comp.rotate(angle)
         pcb.resolve_conflicts()
 
